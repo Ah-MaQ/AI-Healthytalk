@@ -59,16 +59,16 @@ for p in range(pages):
     url = base_url + str(p+1)
     get_disease_info(url)
 
-df = pd.DataFrame({'질병명':TITLE, '증상':SYMPTOMS, '관련질환':RELATED_DISEASES, '진료과':DEPARTMENTS})
+df = pd.DataFrame({'질환명':TITLE, '증상':SYMPTOMS, '관련질환':RELATED_DISEASES, '진료과':DEPARTMENTS})
 df.to_csv('data/output.csv', encoding='utf-8-sig',index=False)
 
 dataset = []
 for disease in JSON:
-    if disease['증상'] != '' and disease['관련질환'] != '' and disease['진료과목'] != '':
+    if disease['증상'] != '' and disease['진료과목'] != '':
         instruction = disease['증상'] + ' 등의 증상이 있어.'
-        output = disease['질환명'] + '이 의심되네요. ' + disease['진료과목'] + '의 전문의에게 상담을 받아보시는 것을 추천합니다. 이와 관련한 질환으로는 ' + \
-                 disease['관련질환'] + ' 등이 있습니다. '
+        output = disease['질환명'] + ' 같은 질환이 의심되네요. ' + disease['진료과목'] + '의 전문의에게 상담을 받아보시는 것을 추천합니다. '
         dataset.append({'instruction': instruction, 'input': '', 'output': output})
+        
 with open('data/only_diseases.json', 'w', encoding='utf-8') as f:
     json.dump(dataset, f, indent=4, ensure_ascii=False)
 

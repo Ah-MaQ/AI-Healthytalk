@@ -3,6 +3,7 @@
 
 ```bash
 git clone https://github.com/Ah-MaQ/AI-Healthytalk.git
+(bash) $ npm install localtunnel
 pip install -r requirements.txt
-streamlit run interface.py
+streamlit run chat_bot.py
 ```
