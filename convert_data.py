@@ -8,7 +8,7 @@ login(token=os.environ.get("HF_CODE"))
 import json
 import numpy as np
 from datasets import Dataset
-
+# disease['질환명'] + ' 같은 질환이 의심되네요. ' + disease['진료과목'] + '의 전문의에게 상담을 받아보시는 것을 추천합니다. '
 with open('data/only_diseases.json','r',encoding='utf-8') as f:
     ori_data = json.load(f)
 dataset = []

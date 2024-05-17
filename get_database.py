@@ -9,7 +9,6 @@ TITLE = []
 SYMPTOMS = []
 RELATED_DISEASES = []
 DEPARTMENTS = []
-JSON = []
 
 def get_disease_info(url):
     response = requests.get(url)
@@ -49,7 +48,6 @@ def get_disease_info(url):
         SYMPTOMS.append(symptoms)
         RELATED_DISEASES.append(related_diseases)
         DEPARTMENTS.append(departments)
-        JSON.append({'질환명':title, '증상':symptoms, '관련질환':related_diseases, '진료과목':departments})
 
 base_url = "https://www.amc.seoul.kr/asan/healthinfo/disease/diseaseList.do?searchKeyword=&pageIndex="
 response = requests.get(base_url+'1')
@@ -59,18 +57,20 @@ for p in range(pages):
     url = base_url + str(p+1)
     get_disease_info(url)
 
-df = pd.DataFrame({'질환명':TITLE, '증상':SYMPTOMS, '관련질환':RELATED_DISEASES, '진료과':DEPARTMENTS})
-df.to_csv('data/output.csv', encoding='utf-8-sig',index=False)
+df = pd.DataFrame({'질환명':TITLE, '증상':SYMPTOMS, '관련질환':RELATED_DISEASES, '진료과목':DEPARTMENTS})
+for i, val in enumerate(df['증상']):
+    if '무증상' in val:
+        df.loc[i, '증상'] = val.replace('무증상, ', '').replace(', 무증상', '')
+    if '손,발,' in val:
+        df.loc[i, '증상'] = val.replace('손,발,', '손 발 ')
+    if '손, 발,' in val:
+        df.loc[i, '증상'] = val.replace('손, 발,', '손 발 ')
+    if '손,발' in val:
+        df.loc[i, '증상'] = val.replace('손,발', '손 발')
+    if '손, 발' in val:
+        df.loc[i, '증상'] = val.replace('손, 발', '손 발')
+    if '4,' in val:
+        df.loc[i, '증상'] = val.replace('4,', '4 ')
+df = df[(df['증상'] != '') & (df['증상'] != '무증상')]
 
-dataset = []
-for disease in JSON:
-    if disease['증상'] != '' and disease['진료과목'] != '':
-        instruction = disease['증상'] + ' 등의 증상이 있어.'
-        output = disease['질환명'] + ' 같은 질환이 의심되네요. ' + disease['진료과목'] + '의 전문의에게 상담을 받아보시는 것을 추천합니다. '
-        dataset.append({'instruction': instruction, 'input': '', 'output': output})
-        
-with open('data/only_diseases.json', 'w', encoding='utf-8') as f:
-    json.dump(dataset, f, indent=4, ensure_ascii=False)
-
-with open('data/output.json','w', encoding='utf-8') as f:
-    json.dump(JSON, f, indent=4, ensure_ascii=False)
+df.to_csv('data/output.csv', encoding='utf-8',index=False)

@@ -3,7 +3,7 @@
 
 ```bash
 git clone https://github.com/Ah-MaQ/AI-Healthytalk.git
-(bash) $ npm install localtunnel
 pip install -r requirements.txt
-streamlit run chat_bot.py
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+streamlit run chatbot.py
 ```
