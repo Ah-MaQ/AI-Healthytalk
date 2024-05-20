@@ -43,36 +43,55 @@ def model_generator(base_model, adapter_dir):
     return pipe
 
 base_model = "beomi/llama-2-ko-7b"
-adapter_dir = "./weights/AHT_6"
+adapter_dir = "./weights/AHT_8"
 pipe = model_generator(base_model, adapter_dir)
 
 # 챗봇
+import re
+from collections import deque
+
 hisory_lim = 5
-chat_history = {'user':deque([""], maxlen=hisory_lim),'assistant':deque([""], maxlen=hisory_lim)}
+chat_history = {'sym': deque([], maxlen=hisory_lim), 'dis': deque([], maxlen=hisory_lim),
+                'dep': deque([], maxlen=hisory_lim)}
+pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=128)
+
 
 def QA_generator(query):
-    hist_query = ' '.join(hist + query for hist in chat_history['user'])
-    print(hist_query)
-    prompt = f"<s>[INST] {hist_query} [/INST]"
+    # hist_query = ', '.join(hist for hist in chat_history['user'])
+    # if hist_query != '': hist_query += ', '
+    # hist_query += query
+    prompt = f"<s>[INST] {query} [/INST]"
 
     result = pipe(prompt)
-    response = result[0]['generated_text'].split("[/INST] ")[1]
-    if "추천합니다." in response:
-        pattern = r'(.*?) 추천합니다\. '
-        match = re.search(pattern, response)
-        if match:
-            response = match.group(0)
-            chat_history['user'].append(query)
-            chat_history['assistant'].append(response)
-            print(chat_history)
-    elif "알려드릴게요." in response:
-        pattern = r'(.*?) 알려드릴게요\. '
-        match = re.search(pattern, response, re.DOTALL)
-        if match:
-            response = match.group(0)
+    try:
+        response = result[0]['generated_text'].split("[/INST] ")[1]
+        if "추천합니다." in response:
+            pattern = r'(.*?) 추천합니다\. '
+            match = re.search(pattern, response)
+            if match:
+                response = match.group(0)
+                symptom, answer = response.split(" [SYM]")
+                chat_history['sym'].append(symptom)
+                chat_history['dis'].append(re.findall(r"(.+?) 같은 질환이", answer, re.DOTALL)[0])
+                chat_history['dep'].append(re.findall(r"의심되네요. (.+?)의 전문의", answer, re.DOTALL)[0])
+            else:
+                answer = response
+
+        elif "알려드릴게요." in response:
+            pattern = r'(.*?) 알려드릴게요\. '
+            match = re.search(pattern, response, re.DOTALL)
+            if match:
+                answer = match.group(0)
+            else:
+                answer = response
+        else:
+            answer = result[0]['generated_text']
+    except:
+        answer = result[0]['generated_text']
 
     print(f"Q. {query}")
-    print(f"A. {response}")
+    print(f"A. {answer}")
+    print(chat_history)
 
     return response
 

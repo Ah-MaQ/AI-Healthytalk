@@ -1,0 +1,5 @@
+model : beomi/llama-2-ko-7b 
+
+epoch : 5
+
+dataset : 증강 + 증상[SYM]

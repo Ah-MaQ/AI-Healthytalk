@@ -58,19 +58,42 @@ for p in range(pages):
     get_disease_info(url)
 
 df = pd.DataFrame({'질환명':TITLE, '증상':SYMPTOMS, '관련질환':RELATED_DISEASES, '진료과목':DEPARTMENTS})
-for i, val in enumerate(df['증상']):
-    if '무증상' in val:
-        df.loc[i, '증상'] = val.replace('무증상, ', '').replace(', 무증상', '')
-    if '손,발,' in val:
-        df.loc[i, '증상'] = val.replace('손,발,', '손 발 ')
-    if '손, 발,' in val:
-        df.loc[i, '증상'] = val.replace('손, 발,', '손 발 ')
-    if '손,발' in val:
-        df.loc[i, '증상'] = val.replace('손,발', '손 발')
-    if '손, 발' in val:
-        df.loc[i, '증상'] = val.replace('손, 발', '손 발')
-    if '4,' in val:
-        df.loc[i, '증상'] = val.replace('4,', '4 ')
-df = df[(df['증상'] != '') & (df['증상'] != '무증상')]
+df = df[(df['증상'] != '') & (df['증상'] != '무증상') & (df['진료과목'] != '')]
+
+for index, row in df.iterrows():
+    if '무증상' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('무증상, ', '').replace(', 무증상', '')
+    if '손,발,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('손,발,', '손 발 ')
+    if '손 발,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('손 발,', '손 발 ')
+    if '손, 발,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('손, 발,', '손 발 ')
+    if '손,발' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('손,발', '손 발')
+    if '손, 발' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('손, 발', '손 발')
+    if '4,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('4,', '4 ')
+    if '눈, 코, 입' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('눈, 코, 입', '눈 코 입')
+    if '눈,뺨' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('눈,뺨', '눈이나 뺨')
+    if '볼,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('볼,', '볼과')
+    if '원형,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('원형,', '원형 및')
+    if '남:' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('남:', '남아')
+    if '여:' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('여:', '여아')
+    if '뼈,근육' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('뼈,근육', '뼈 또는 근육')
+    if '고환,부' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('고환,부', '고환 또는 부')
+    if '입술,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('입술,','입술 및')
+    if '읽기,' in row['증상']:
+        df.at[index, '증상'] = row['증상'].replace('읽기,','읽기 ')
 
 df.to_csv('data/output.csv', encoding='utf-8',index=False)

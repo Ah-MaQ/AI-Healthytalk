@@ -8,19 +8,14 @@ login(token=os.environ.get("HF_CODE"))
 import json
 import numpy as np
 from datasets import Dataset
-# disease['질환명'] + ' 같은 질환이 의심되네요. ' + disease['진료과목'] + '의 전문의에게 상담을 받아보시는 것을 추천합니다. '
-with open('data/only_diseases.json','r',encoding='utf-8') as f:
-    ori_data = json.load(f)
-dataset = []
-for disease in ori_data:
-    inputs = disease["instruction"]
-    response = disease["output"]
-    dataset.append(f'<s>[INST] {inputs} [/INST] {response} </s>')
+
+with open('data/symptoms.json','r',encoding='utf-8') as f:
+    dataset = json.load(f)
 
 with open('data/alpaca_data.json','r',encoding='utf-8') as f:
     data = json.load(f)
 
-selected_list = np.random.choice(len(data), 1000, replace=False)
+selected_list = np.random.choice(len(data), 3000, replace=False)
 
 for i in selected_list:
     if data[i]["input"] == "":
@@ -36,4 +31,4 @@ dataset.save_to_disk("data")
 print('데이터셋 info 확인')
 print(dataset)
 
-dataset.push_to_hub('Jinsuu/AHT_custom_dataset_4')
+dataset.push_to_hub('Jinsuu/AHT_custom_dataset_6')
