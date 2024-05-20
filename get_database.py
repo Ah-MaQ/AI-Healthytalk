@@ -9,6 +9,7 @@ TITLE = []
 SYMPTOMS = []
 RELATED_DISEASES = []
 DEPARTMENTS = []
+CODE = []
 
 def get_disease_info(url):
     response = requests.get(url)
@@ -21,6 +22,16 @@ def get_disease_info(url):
         try:
             # 질병명 추출
             title = disease.find('strong', class_='contTitle').text.strip()
+
+            # ID 추출
+            link_tag = disease.find('a', href=True)
+            href = link_tag['href']
+            match = re.search(r'contentId=(\d+)', href)
+            if match:
+                code = int(match.group(1))
+            else:
+                code = 0
+
             title = re.sub(r'\([^ㄱ-힇]*\)', '', title)
 
             # 증상 추출
@@ -48,6 +59,7 @@ def get_disease_info(url):
         SYMPTOMS.append(symptoms)
         RELATED_DISEASES.append(related_diseases)
         DEPARTMENTS.append(departments)
+        CODE.append(code)
 
 base_url = "https://www.amc.seoul.kr/asan/healthinfo/disease/diseaseList.do?searchKeyword=&pageIndex="
 response = requests.get(base_url+'1')
@@ -57,7 +69,7 @@ for p in range(pages):
     url = base_url + str(p+1)
     get_disease_info(url)
 
-df = pd.DataFrame({'질환명':TITLE, '증상':SYMPTOMS, '관련질환':RELATED_DISEASES, '진료과목':DEPARTMENTS})
+df = pd.DataFrame({'질환명':TITLE, '증상':SYMPTOMS, '관련질환':RELATED_DISEASES, '진료과목':DEPARTMENTS, '코드':CODE})
 df = df[(df['증상'] != '') & (df['증상'] != '무증상') & (df['진료과목'] != '')]
 
 for index, row in df.iterrows():
