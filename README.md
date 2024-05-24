@@ -3,7 +3,10 @@
 
 ```bash
 git clone https://github.com/Ah-MaQ/AI-Healthytalk.git
+cd AI-Healthytalk
+
 pip install -r requirements.txt
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-streamlit run chatbot.py
+
+streamlit run ./My_Page.py
 ```
