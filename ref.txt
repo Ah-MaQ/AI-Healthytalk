@@ -1,0 +1,7 @@
+python.exe -m pip install --upgrade pip
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install accelerate bitsandbytes transformers peft streamlit streamlit_cookies_manager beautifulsoup4
+
+python flask_server.py
+streamlit run ./My_Page.py
+npx lt --port 8501 --subdomain amqht    119.194.145.146
