@@ -1,5 +1,5 @@
 # AI-Healthytalk
-<img src="./logo/healthytalk.png" width="40%">
+<img src="./logo/healthytalk.png" width="20%">
 질환 예측 및 진료과 추천을 위한 AI 어플리케이션
 
 ```bash
